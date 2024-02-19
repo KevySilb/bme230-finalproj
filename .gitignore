@@ -1,0 +1,6 @@
+*.pdf
+*.mp4
+*.ipynb
+*.log
+*.venv
+__pycache__/
