@@ -1,6 +1,6 @@
 *.pdf
 *.mp4
-*.ipynb
+#*.ipynb
 *.log
 *.venv
 __pycache__/
