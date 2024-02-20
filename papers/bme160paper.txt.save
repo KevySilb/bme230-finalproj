@@ -1,0 +1,39 @@
+Kevin Silberberg; Danielle Haley 
+BME 160 
+Final Project 
+
+Analyzing contiguous DNA sequences by constructing a probability matrix
+
+ABSTRACT: 
+
+In comparative genomics, the analysis of similarity between multiple contiguous (contig) sequences in one sample via alignment methods is computationally demanding. A viral genome can encompass anywhere from a few thousand to 10 thousand nucleotides, making pairwise comparison algorithmically complex. Although contiguous sequences are short reads, approximately 500 base pairs long, each sample contains several thousand contigs. This totals to millions of base pairs. For our project, we chose to employ alignment-free methods such as k-mer analysis. Instead of performing pairwise comparisons of each contig, we construct an array of probabilities. Each element in this array corresponds to the probability that a specific 4-letter word (4-mer) and its reverse complement appear in the contiguous sequence – a unique fingerprint of the sequence. This fingerprint of the sequence indirectly infers characteristics like codon bias and GC content which are normally used in comparative analysis. We can then algorithmically compare these fingerprints through hierarchical clustering. The objective of our program is to readily identify the most related contiguous sequences from a single sample, facilitating further identification of the species through the Basic Local Alignment Search Tool (BLAST).
+
+INTRODUCTION:
+
+	In order to better understand the biodiversity and richness of often overlooked environments, such as salt lakes, we would need to be able to identify with a high level of confidence the relatedness of short read DNA sequences. Often, these species inhabit extreme or lesser-studied environments, such as salt lakes, presenting an exciting, yet challenging, prospect for scientific research. The method of obtaining DNA samples from these locations and analyzing them using alignment methods can be computationally intensive, particularly when handling viral genomes, which can contain thousands to approximately ten thousand nucleotides.
+
+Despite each contig being a short read (approximately 500 base pairs long), the thousands of contigs in a sample collectively amount to millions of base pairs. As a result, the need for more efficient, less computationally demanding approaches is clear. In our project, we aim to mitigate these challenges by adopting alignment-free methods, such as k-mer analysis. This technique enables us to build a probabilistic model of each contig, thereby creating a unique 'fingerprint' for each sequence. Our objective is to readily identify the most related contiguous sequences from a single sample, streamlining the process of species identification. This endeavor aligns with the broader goal of unearthing the vast potential of untapped viral biodiversity in underexplored environments such as salt lakes.
+
+
+
+DESCRIPTION OF SOLUTION:
+
+Our solution leverages object-oriented programming techniques to construct a probability dictionary for each contiguous DNA sequence, or 'contig'. We accomplish this by creating a specific class for each contig that performs computations on the associated DNA sequence. The construction process initializes a dictionary using all potential 4-mer combinations derived from the nucleotide alphabet (A, T, C, G). The total number of possible 4-mers is computed as the size of the alphabet (4) raised to the power of the word size (4), which yields 256 possibilities. We generate a list of these 4-mers using the itertools package's product() function. As we iterate through the list, we create frozensets of each 4-mer and its reverse complement, which serve as keys in our 4-mer dictionary. This step effectively reduces our dictionary size to 136 entries, accounting for palindromes and reverse complements.
+
+The 'kmerfinder' method iterates through the nucleotide sequence one nucleotide at a time, incrementing the count of each 4-mer and its reverse complement in the dictionary. Subsequently, the values in the dictionary are normalized to represent the probabilities of encountering the respective 4-mers in the sequence. The main program constructs a joint probability matrix by iterating over each object in the class object list, creating a temporary list of probability values for each object, and appending this list to the matrix. We then use this matrix to generate a DataFrame object, using the pandas Python package. The row indices of the DataFrame correspond to the names of the contigs as they appear in the FASTA file. Each column represents a 4-mer set, for example, the first few columns reflects the probabilities of the sets {AAAA, TTTT}, {AAAC, GTTT}, and {CTTT, AAAG} appearing in the original sequence.
+
+The Node class, defined in our program, computes the Euclidean distance between each pair of contigs' probability vectors and constructs a linkage matrix using the scipy's spatial distance and cluster hierarchy package with the ward’s linkage criterion. Ward's linkage criterion aims to minimize the variance within each cluster when merging clusters. It calculates the increase in the sum of squared distances (variance) that would result from merging two clusters. The clusters with the smallest increase in variance are merged. Its 'cluster' method populates a list of cluster assignment sequences based on the cutoff threshold and the linkage matrix. Finally, the 'get_most_similar_cluster' method identifies a single cluster of contigs that are the most similar to each other. This similarity is measured based on the average Euclidean distance between the probability vectors associated with each contig. The main program then outputs a list of these most similar contig header names. 
+
+CONCLUSION: 
+	
+	We successfully developed and implemented a program that employs a probabilistic approach to examine contiguous DNA sequences. Our computational tool was applied to an extensive dataset comprising 13573 contigs. Through the processes of calculating 4-mer probabilities, creating a joint probability matrix, and conducting hierarchical clustering, our program was able to identify a cluster of 35 contigs that exhibited the most significant similarities in terms of their probability vectors. As these 35 contigs are most closely related in terms of their 4-mer probabilities, they potentially originate from the same or very similar species of organisms, or perhaps share significant functional similarities.
+
+Our study opens up promising avenues for further research. Notably, we have not yet utilized the Basic Local Alignment Search Tool (BLAST) to analyze the identified sequences. Integrating BLAST analysis into our future work would provide an opportunity to explore whether these sequences have similar gene products. This would further enable us to ascertain whether these contigs are associated with the same virus or a group of closely related viruses. Hence, our study sets a robust foundation for enhanced genetic analysis and illustrates the potential of probabilistic and clustering techniques in genomic studies.
+
+SOURCES:
+
+Bussi Y, Kapon R, Reich Z. Large-scale k-mer-based analysis of the informational properties of genomes, comparative genomics and taxonomy. PLoS One. 2021 Oct 14;16(10):e0258693. doi: 10.1371/journal.pone.0258693. PMID: 34648558; PMCID: PMC8516232.
+
+Wang M, Abrams ZB, Kornblau SM, Coombes KR. Thresher: determining the number of clusters while removing outliers. BMC Bioinformatics. 2018 Jan 8;19(1):9. doi: 10.1186/s12859-017-1998-9. PMID: 29310570; PMCID: PMC5759208.
+
+Liu X, Cheng Z, Xu G, Xie J, Liu X, Ren B, Ai D, Chen Y, Xia LC. Ksak: A high-throughput tool for alignment-free phylogenetics. Front Microbiol. 2023 Mar 30;14:1050130. doi: 10.3389/fmicb.2023.1050130. Erratum in: Front Microbiol. 2023 May 10;14:1212612. PMID: 37065122; PMCID: PMC10098151.
