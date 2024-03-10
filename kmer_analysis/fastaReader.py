@@ -62,3 +62,30 @@ class FastAreader:
                     sequence += ''.join(line.rstrip().split()).upper()
 
         yield header,sequence
+
+    def get_dict(self):
+        """
+        Read FASTA format sequences from the opened file or stdin and store in a dictionary.
+
+        Returns:
+            dict: A dictionary where keys are headers and values are sequences.
+        """
+        fastaDict = {}  # Initialize an empty dictionary to store the FASTA records
+
+        with self.doOpen() as fileH:
+            header = None
+
+            for line in fileH:
+                line = line.strip()
+                if line.startswith('>'):  # Found a header line
+                    if header:  # If there was a previous header, store the sequence
+                        fastaDict[header] = sequence
+                    header = line[1:]  # Remove '>' and store the new header
+                    sequence = ''  # Reset sequence for the new header
+                else:
+                    sequence += line  # Accumulate sequence lines
+
+            if header:
+                fastaDict[header] = sequence
+
+        return fastaDict
