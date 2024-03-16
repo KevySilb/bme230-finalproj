@@ -9,10 +9,10 @@ Mario Panuco / Kevin Silberberg final project for BME230A
 - []()
 - []()
 - []()
-- []()
 
 
 
+[shotgun sequencing](https://www.annualreviews.org/doi/pdf/10.1146/annurev-genom-090314-050032)
 [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6262761/pdf/nihms-1500950.pdf)
 [Dimensionality Reduction](https://web.stanford.edu/class/cs168/l/l4.pdf)
 [MetaDecoder](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-022-01237-8)
