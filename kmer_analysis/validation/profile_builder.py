@@ -56,7 +56,6 @@ def make_temp_dict(k):
     alphabet = ['A', 'T', 'G', 'C']
     nucMap = {'A':'T', 'T':'A', 'G':'C', 'C':'G'}
     kmerPermutations = [''.join(p) for p in it.product(alphabet, repeat=k)]
-    print(kmerPermutations)
     templateDict = dict()
     kmerMap = dict()
     # make kmerMap
@@ -121,10 +120,6 @@ def get_profiles(dir_path = 'Escherichia_coli_subsequences'):
         pkl.dump(profiles, file, protocol=pkl.HIGHEST_PROTOCOL)
         
 def get_original_profile(inFile, k):
-    # filenames = ['Mycobacteriumphage.fna', 'VibrioPhage_pVa-1.fna']
-    # for file in filenames:
-    #     for i in range(1, 11):
-    #         get_original_profile(file, k = i)
     outFile = f"{inFile.split('.fna')[0]}_{k}.pkl"
     templateKmerDict, kmerMap = make_temp_dict(k)
     myReader = FastAreader(inFile)
@@ -184,7 +179,7 @@ def kmeans_cluster(k, edges):
         cluster_set = set()
         for contig in cluster.index:
             cluster_set.add(int(contig.split('_')[1]))
-        print(cluster_set & edges)
+        print(cluster_set)
 
     # cluster_dicts = []
     # for _, cluster in clusters:
@@ -224,6 +219,19 @@ def kmeans_cluster(k, edges):
     # plt.show()
 
 def main():
+    temp_dict, kmer_dict = make_temp_dict(5)
+    myReader = FastAreader('assembly_2.fasta')
+    objList = []
+    for head, seq in myReader.readFasta():
+        objList.append(Contig(head, seq, templateDict=temp_dict, kmerMap= kmer_dict))
+    profile = BuildProfile(objList=objList, templateKmerDict=temp_dict)
+    with open(os.path.join('assembly_2_profiles.pkl'), 'wb') as file:
+        pkl.dump(profile.df, file, protocol=pkl.HIGHEST_PROTOCOL)
+
+    # filenames = ['Mycobacteriumphage.fna', 'VibrioPhage_pVa-1.fna', 'Staphylococcus_aureus.fna', 'Escherichia_coli_complete.fna']
+    # for file in filenames:
+    #     for i in range(1, 11):
+    #         get_original_profile(file, k = i)
     # distance = pdist(profile.df) #default is euclidean distance
     # linkage_matrix = linkage(distance, method='ward') # can be centroid or median for Euclidean distance 
     # The next step is to perform AgglomerativeClustering and then see how hierarchial clustering performs 
@@ -232,7 +240,8 @@ def main():
     # also you need to actually work on bernicks samples 
     # edges = {69, 44, 195, 176, 23, 14, 198, 199, 15, 12, 10, 11, 8, 161, 4, 18, 20}
     # kmeans_cluster(5, edges)
-    temp_dict, _ = make_temp_dict(2)
-    print(temp_dict)
+
+
+
 if __name__ == "__main__":
     main()

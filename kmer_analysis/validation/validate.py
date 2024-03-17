@@ -114,57 +114,76 @@ def compare_KLs(filenames:list):
     plt.title("")
     plt.show()
 
-def compare_KL_kmer_size(filenames, delete = False):
-    # filenames = []
-    # for i in range(1, 11):
-    #     filenames.append(f'VibrioPhage_pVa-1_{i}.pkl')
-    #     filenames.append(f'Mycobacteriumphage_{i}.pkl')
-    # compare_KL_kmer_size(filenames, delete = True)
-    dfs_dict = dict()
-    names = []
-    kmersizes = []
-    genomesizes = []
-    for i in range(len(filenames)):
-        filename = filenames[i]
-        kmersize = filename.split('_')[-1].split('.pkl')[0]
-        name = filename.split('_')[0]
-        filetag = name + kmersize
-        names.append(name)
-        if int(kmersize) not in kmersizes:
-            kmersizes.append(int(kmersize))
-        with open(filename, 'rb') as file:
-            profile = pkl.load(file)
-            genomesizes.append(profile.length)
-            dfs_dict[filetag] = profile.df
+def compare_KL_kmer_size(filenames1, filenames2, delete = False):
+    filesys = (filenames1, filenames2)
+    for filenames in filesys:
+        dfs_dict = dict()
+        names = []
+        kmersizes = []
+        genomesizes = []
+        for i in range(len(filenames)):
+            filename = filenames[i]
+            kmersize = filename.split('_')[-1].split('.pkl')[0]
+            name = filename.split('_')[0]
+            filetag = name + kmersize
+            names.append(name)
+            if int(kmersize) not in kmersizes:
+                kmersizes.append(int(kmersize))
+            with open(filename, 'rb') as file:
+                profile = pkl.load(file)
+                genomesizes.append(profile.length)
+                dfs_dict[filetag] = profile.df
 
-    dfs = [df.values for df in dfs_dict.values()]
+        dfs = [df.values for df in dfs_dict.values()]
 
-    KLD_between_kmersize = []
-    for i in range(0, len(dfs_dict) - 1, 2):
-        KLD = np.longdouble(0.0)
-        df1 = dfs[i][0]
-        df2 = dfs[i+1][0]
-        assert len(df1) == len(df2)
-        for j in range(len(df1)):
-            KLD += KL_divergence(df1[j], df2[j])
-        KLD_between_kmersize.append(KLD)
-    assert len(kmersizes) == len(KLD_between_kmersize)
-    plt.scatter(kmersizes, KLD_between_kmersize)
-    plt.xlabel('Kmer size')
-    plt.ylabel('Kullbach-Leibler Divergence')
-    plt.title('P = {} {:.3f}Kb, Q = {} {:.3f}Kb'.format(names[0], genomesizes[0] / 1e3, names[1], genomesizes[1] / 1e3))
-    plt.xticks(kmersizes)
-    plt.show()
+        KLD_between_kmersize = []
+        for i in range(0, len(dfs_dict) - 1, 2):
+            KLD = np.longdouble(0.0)
+            df1 = dfs[i][0]
+            df2 = dfs[i+1][0]
+            assert len(df1) == len(df2)
+            for j in range(len(df1)):
+                KLD += KL_divergence(df1[j], df2[j])
+            KLD_between_kmersize.append(KLD)
+        assert len(kmersizes) == len(KLD_between_kmersize)
+        plt.scatter(kmersizes, KLD_between_kmersize, label = f'P = {genomesizes[0] / 1e3:.1f}Kb\nQ = {genomesizes[1] / 1e3:.1f}Kb')
+        # plt.axvline(kmersizes[KLD_between_kmersize.index(max(KLD_between_kmersize))], alpha = 0.6, linestyle = '--', label = r'optimal $k$')
+        # plt.title('P = {} {:.3f}Kb, Q = {} {:.3f}Kb'.format(names[0], genomesizes[0] / 1e3, names[1], genomesizes[1] / 1e3))
+
+
     if delete:
-        for filename in filenames:
+        for filename in filenames1:
             try:
                 os.remove(filename)
                 print(f"Deleted {filename}")
             except FileNotFoundError:
                 print(f"{filename} not found, skipping.")
+        for filename in filenames2:
+            try:
+                os.remove(filename)
+                print(f"Deleted {filename}")
+            except FileNotFoundError:
+                print(f"{filename} not found, skipping.")
+    plt.xticks(kmersizes)
+    plt.xlabel(r'Kmer size')
+    plt.ylabel(r'Kullbach-Leibler Divergence')
+    plt.title(r'Optimal $k$ size for varying contig length')
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    plt.tight_layout()
+    plt.show()
 
 def main():
-    pass
+    filenames1 = []
+    filenames2 = []
+    for i in range(1, 11):
+        filenames1.append(f'Mycobacteriumphage_{i}.pkl')
+        filenames1.append(f'VibrioPhage_pVa-1_{i}.pkl')
+
+    for i in range(1, 11):
+        filenames2.append(f'Escherichia_coli_complete_{i}.pkl')
+        filenames2.append(f'Staphylococcus_aureus_{i}.pkl')
+
+    compare_KL_kmer_size(filenames1, filenames2, delete = True)
 
 if __name__ == "__main__":
     main()
