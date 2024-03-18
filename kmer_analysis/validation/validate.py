@@ -173,17 +173,13 @@ def compare_KL_kmer_size(filenames1, filenames2, delete = False):
     plt.show()
 
 def main():
-    filenames1 = []
-    filenames2 = []
-    for i in range(1, 11):
-        filenames1.append(f'Mycobacteriumphage_{i}.pkl')
-        filenames1.append(f'VibrioPhage_pVa-1_{i}.pkl')
+    # with open('assembly_2_profiles.pkl', 'rb') as file:
+    #     profile = pkl.load(file)
+    
+    # for contig in profile.index:
+    #     if contig == 'contig_69':
+    #         print('yes')
 
-    for i in range(1, 11):
-        filenames2.append(f'Escherichia_coli_complete_{i}.pkl')
-        filenames2.append(f'Staphylococcus_aureus_{i}.pkl')
-
-    compare_KL_kmer_size(filenames1, filenames2, delete = True)
 
 if __name__ == "__main__":
     main()

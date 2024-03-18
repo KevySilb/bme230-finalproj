@@ -154,6 +154,23 @@ def kmeans_cluster(k, edges):
         objList.append(obj)
     profile = BuildProfile(objList, templateKmerDict)
     X = profile.df.values
+    # ---------------------------------------------------------------------------
+    # wcss = []
+    # k_values = range(2, 11)  # You can adjust the range of k values as needed
+    # for j in k_values:
+    #     kmeans = KMeans(n_clusters=j, random_state=42)
+    #     kmeans.fit(X)
+    #     wcss.append(kmeans.inertia_)  # .inertia_ gives the WCSS value for the fitted model
+
+    # # Plotting the elbow plot
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(k_values, wcss, marker='o')
+    # plt.title('Elbow Plot for assembly.fasta')
+    # plt.xlabel('Number of Clusters')
+    # plt.ylabel('WCSS')
+    # plt.xticks(k_values)
+    # plt.grid(True)
+    # plt.show()
     # -----------------------------------------------------------------------------
     # k_values = range(2, 11)
     # silhouette_scores = []
@@ -164,8 +181,8 @@ def kmeans_cluster(k, edges):
     #     silhouette_scores.append(silhouette_avg)
     # plt.figure(figsize=(8, 6))
     # plt.plot(k_values, silhouette_scores, marker='o')
-    # plt.title('assembly_2.fasta')
-    # plt.xlabel('Number of Clusters (k)')
+    # plt.title('Silhouette scores for assembly.fasta')
+    # plt.xlabel('Number of Clusters')
     # plt.ylabel('Silhouette Score')
     # plt.xticks(k_values)
     # plt.grid(True)
@@ -179,69 +196,30 @@ def kmeans_cluster(k, edges):
         cluster_set = set()
         for contig in cluster.index:
             cluster_set.add(int(contig.split('_')[1]))
-        print(cluster_set)
-
-    # cluster_dicts = []
-    # for _, cluster in clusters:
-    #     names = cluster.index.str.split('_').str[0]
-    #     count = Counter(names)
-    #     # total = sum(count.values())
-    #     proportions = {key: value for key, value in count.items()}
-    #     cluster_dicts.append(proportions)
-    # indices = np.arange(0, len(cluster_dicts))
-    # all_species = set()
-    # for cluster_dict in cluster_dicts:
-    #     all_species.update(cluster_dict.keys())
-    
-    # fig, ax = plt.subplots()
-
-    # bar_width = 0.1
-
-    # for i, species in enumerate(all_species):
-    #     # Extracting accuracy values for each cluster for the current bacterium
-    #     accuracies = [cluster_dict.get(species, 0) for cluster_dict in cluster_dicts]
-        
-    #     # Plotting
-    #     ax.bar(indices + i * bar_width, accuracies, width=bar_width, label=species)
-
-    # # Setting the x-axis ticks and labels
-    # ax.set_xticks(indices + (len(all_species) * bar_width / 2))
-    # ax.set_xticklabels([f'Cluster {i+1}' for i in range(len(cluster_dicts))])
-
-    # # Adding labels and title
-    # ax.set_ylabel('Composition')
-    # ax.set_title(f'K={k}, assembly_2.fasta')
-
-    # # Adding a legend
-    # ax.legend()
-
-    # # Display the plot
-    # plt.show()
+        print(number, cluster_set & edges)
 
 def main():
-    temp_dict, kmer_dict = make_temp_dict(5)
-    myReader = FastAreader('assembly_2.fasta')
-    objList = []
-    for head, seq in myReader.readFasta():
-        objList.append(Contig(head, seq, templateDict=temp_dict, kmerMap= kmer_dict))
-    profile = BuildProfile(objList=objList, templateKmerDict=temp_dict)
-    with open(os.path.join('assembly_2_profiles.pkl'), 'wb') as file:
-        pkl.dump(profile.df, file, protocol=pkl.HIGHEST_PROTOCOL)
+    edges = {2, 69, 44, 195, 176, 23, 14, 198, 199, 15, 12, 10, 11, 8, 161, 4, 18, 20}
+    # myReader = FastAreader('assembly_2.fasta')
+    # with open('majority_bandage.fasta', 'w') as file:
+    #     for head, seq in myReader.readFasta():
+    #         edge = int(head.split('_')[1])
+    #         if edge not in edges:
+    #             continue
+    #         else:
+    #             file.write(f'>{head}\n{seq}\n')
+    # myReader = FastAreader('majority_bandage.fasta')
+    # edges2 = set()
+    # for head, seq in myReader.readFasta():
+    #     edge = int(head.split('_')[1])
+    #     edges2.add(edge)
+    # print(edges2 ^ edges)
 
-    # filenames = ['Mycobacteriumphage.fna', 'VibrioPhage_pVa-1.fna', 'Staphylococcus_aureus.fna', 'Escherichia_coli_complete.fna']
-    # for file in filenames:
-    #     for i in range(1, 11):
-    #         get_original_profile(file, k = i)
-    # distance = pdist(profile.df) #default is euclidean distance
-    # linkage_matrix = linkage(distance, method='ward') # can be centroid or median for Euclidean distance 
-    # The next step is to perform AgglomerativeClustering and then see how hierarchial clustering performs 
-    # also play around with dendrograms at small sample sizes
-
-    # also you need to actually work on bernicks samples 
-    # edges = {69, 44, 195, 176, 23, 14, 198, 199, 15, 12, 10, 11, 8, 161, 4, 18, 20}
-    # kmeans_cluster(5, edges)
+    kmeans_cluster(5, edges)
 
 
+
+        
 
 if __name__ == "__main__":
     main()
