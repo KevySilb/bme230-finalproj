@@ -56,7 +56,9 @@ def rev_compliment(kmer, nucMap):
     for char in kmer:
         string.append(nucMap[char])
     return ''.join(string[::-1])
-        
+    # print(f"path: {[self.gfa.get_segment_name(index) for index in path]}")
+
+
 def make_temp_dict(k):
     """
     Constructs a template dictionary to be passed and copied to every contig class.
