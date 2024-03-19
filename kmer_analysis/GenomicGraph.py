@@ -25,37 +25,6 @@ class GenomicGraph:
         largest_component = max(nx.connected_components(self.graph), key=len)
         return self.graph.subgraph(largest_component)
 
-    def find_significant_cycle(self):
-        def find_cycle(start_node):
-            visited = set()
-            stack = [(start_node, [start_node])]
-
-            while stack:
-                node, path = stack.pop()
-                visited.add(node)
-
-                for neighbor in self.graph.neighbors(node):
-                    if neighbor == start_node and len(path) > 2:
-                        return path
-                    elif neighbor not in visited:
-                        stack.append((neighbor, path + [neighbor]))
-
-            return []
-
-        # Find nodes that are connectors (nodes that connect two or more distinct paths)
-        candidate_nodes = [node for node in self.graph.nodes if len(list(self.graph.neighbors(node))) > 1]
-
-        # Explore cycles starting from candidate nodes
-        largest_cycle = []
-        for node in candidate_nodes:
-            cycle = find_cycle(node)
-            if len(cycle) > len(largest_cycle):
-                largest_cycle = cycle
-
-        # Convert node indices in the cycle back to segment names
-        largest_cycle_contigs = [self.gfa.get_segment_name(node) for node in largest_cycle]
-
-        return largest_cycle_contigs
 
     def find_highest_coverage_node(self, subgraph):
         highest_coverage_node = max(subgraph, key=lambda node: self.coverage_data.get(node, 0))
